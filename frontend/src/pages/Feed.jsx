@@ -88,10 +88,14 @@ export default function Feed() {
     if (likesInFlight.current.has(post._id)) return;
     likesInFlight.current.add(post._id);
 
-    const previous = { likedByMe: post.likedByMe, likeCount: post.likeCount };
+    // Read the count exactly as PostCard renders it: a post that ever arrives
+    // without the derived virtual would otherwise make the count NaN.
+    const currentCount = post.likeCount ?? post.likes?.length ?? 0;
+    const previous = { likedByMe: post.likedByMe, likeCount: currentCount };
+
     patchPost(post._id, {
       likedByMe: !post.likedByMe,
-      likeCount: post.likeCount + (post.likedByMe ? -1 : 1),
+      likeCount: currentCount + (post.likedByMe ? -1 : 1),
     });
 
     try {
@@ -122,6 +126,8 @@ export default function Feed() {
     try {
       await postsApi.remove(post._id);
       setPosts((current) => current.filter((item) => item._id !== post._id));
+      // Don't leave the comment modal open on a post that no longer exists.
+      setCommentsFor((open) => (open?._id === post._id ? null : open));
       showSuccess('Post deleted.');
     } catch (deleteError) {
       showError(deleteError.message);
