@@ -9,7 +9,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
  * controllers and schemas, so a passing test says the API behaves, not that
  * the mocks agree with each other.
  */
-export async function startTestServer() {
+export async function startTestServer({ env = {} } = {}) {
   const mongo = await MongoMemoryServer.create();
 
   process.env.MONGODB_URI = mongo.getUri('vibepost_test');
@@ -17,6 +17,10 @@ export async function startTestServer() {
   process.env.JWT_EXPIRES_IN = '7d';
   process.env.CLIENT_URL = 'http://localhost:5173';
   process.env.NODE_ENV = 'test';
+  // Suites create many accounts; the production allowance would stop them.
+  // A suite that is actually testing the limiter overrides this.
+  process.env.AUTH_RATE_LIMIT_MAX = '100000';
+  Object.assign(process.env, env);
 
   // Imported after the environment is set: the app reads CLIENT_URL at import.
   const { default: app } = await import('../../src/app.js');

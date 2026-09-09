@@ -74,10 +74,15 @@ export function errorHandler(err, req, res, next) {
     console.error('[error]', err);
   }
 
+  // Detail is revealed only when explicitly running locally or under test.
+  // Hosting platforms do not always set NODE_ENV, and defaulting to "show the
+  // internal message" would leak on any server that forgot to.
+  const isDiagnosticEnv = ['development', 'test'].includes(process.env.NODE_ENV);
+
   res.status(status).json({
     success: false,
     message:
-      status >= 500 && process.env.NODE_ENV === 'production'
+      status >= 500 && !isDiagnosticEnv
         ? 'Something went wrong. Please try again.'
         : message || 'Something went wrong. Please try again.',
   });
