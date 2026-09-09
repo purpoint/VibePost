@@ -1,5 +1,5 @@
 .card {
-  padding: var(--space-5);
+  padding: var(--space-4);
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -244,5 +244,25 @@
 @media (min-width: 768px) {
   .card {
     padding: var(--space-5) var(--space-6);
+  }
+
+  .name {
+    font-size: var(--text-lg);
+  }
+
+  .meta {
+    font-size: var(--text-sm);
+  }
+
+  .text {
+    font-size: var(--text-lg);
+  }
+}
+
+/* Give tall images a sensible ceiling on a phone so a portrait photo cannot
+   push the engagement footer off the screen entirely. */
+@media (max-width: 767px) {
+  .image {
+    max-height: 62vh;
   }
 }

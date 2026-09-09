@@ -8,13 +8,22 @@
   gap: var(--space-4);
   max-width: var(--feed-max-width);
   margin: 0 auto;
-  padding: var(--space-5) var(--space-4) var(--space-10);
+  /* Mobile keeps a narrow gutter so cards get the width; the bottom padding
+     clears the home indicator on a phone. */
+  padding: var(--space-4) var(--space-3);
+  padding-block-end: calc(var(--space-10) + env(safe-area-inset-bottom));
 }
 
 .list {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+@media (min-width: 1024px) {
+  .list {
+    gap: var(--space-5);
+  }
 }
 
 .resultSummary {
@@ -25,7 +34,15 @@
 @media (min-width: 768px) {
   .main {
     gap: var(--space-5);
+    padding-block-start: var(--space-6);
     padding-inline: var(--space-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .main {
+    gap: var(--space-6);
+    padding-block-start: var(--space-8);
   }
 }
 
