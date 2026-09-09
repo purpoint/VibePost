@@ -69,11 +69,10 @@ const postSchema = new mongoose.Schema(
  * Enforced here as well as in the request validator so the rule holds no
  * matter how a document is created.
  */
-postSchema.pre('validate', function requireContent(next) {
+postSchema.pre('validate', function requireContent() {
   if (!this.text?.trim() && !this.imageUrl?.trim()) {
     this.invalidate('text', 'Post text or image is required');
   }
-  next();
 });
 
 // Counts are derived rather than stored, so they can never drift from the
