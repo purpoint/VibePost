@@ -27,13 +27,23 @@ export async function createPost({ author, text, imageUrl }) {
   return post;
 }
 
+/**
+ * Every sort ends with _id.
+ *
+ * Without it the ordering is not total: posts created in the same millisecond
+ * tie on createdAt, and engagement sorts tie constantly. MongoDB does not
+ * promise a stable order between tied documents, so page 2 could repeat a post
+ * from page 1 or skip one entirely. _id is unique and increases with time,
+ * which makes the ordering deterministic across the separate queries that
+ * paging issues.
+ */
 const SORT_STAGES = {
-  latest: { createdAt: -1 },
-  liked: { likeCount: -1, createdAt: -1 },
-  commented: { commentCount: -1, createdAt: -1 },
+  latest: { createdAt: -1, _id: -1 },
+  liked: { likeCount: -1, createdAt: -1, _id: -1 },
+  commented: { commentCount: -1, createdAt: -1, _id: -1 },
   // Deliberately simple: what other people are engaging with, newest first
   // among equals. No recommendation model, as the milestone doc asks.
-  foryou: { engagementScore: -1, createdAt: -1 },
+  foryou: { engagementScore: -1, createdAt: -1, _id: -1 },
 };
 
 /**
@@ -207,7 +217,7 @@ export async function addComment({ postId, user, text }) {
   const post = await Post.findByIdAndUpdate(
     postId,
     { $push: { comments: comment } },
-    { new: true, select: 'comments' }
+    { returnDocument: 'after', select: 'comments' }
   );
 
   if (!post) {
