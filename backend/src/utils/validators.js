@@ -83,3 +83,34 @@ export function validatePostInput(body = {}) {
 
   return { text, imageUrl };
 }
+
+export const FEED_SORTS = ['latest', 'liked', 'commented'];
+const FEED_LIMIT_MAX = 50;
+const SEARCH_MAX_LENGTH = 100;
+
+/**
+ * Escapes a user-supplied search term before it is used in a regular
+ * expression, so characters like ( or * cannot alter the pattern or be used to
+ * build a catastrophically slow one.
+ */
+export function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Parses and clamps the feed query string. Out-of-range values are corrected
+ * rather than rejected, so a bad link still renders a sensible page.
+ */
+export function parseFeedQuery(query = {}) {
+  const page = Math.max(1, Number.parseInt(query.page, 10) || 1);
+
+  const requestedLimit = Number.parseInt(query.limit, 10) || 10;
+  const limit = Math.min(FEED_LIMIT_MAX, Math.max(1, requestedLimit));
+
+  const sort = FEED_SORTS.includes(query.sort) ? query.sort : 'latest';
+
+  const search =
+    typeof query.search === 'string' ? query.search.trim().slice(0, SEARCH_MAX_LENGTH) : '';
+
+  return { page, limit, sort, search };
+}

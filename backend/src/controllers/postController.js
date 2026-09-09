@@ -1,5 +1,5 @@
 import * as postService from '../services/postService.js';
-import { validatePostInput } from '../utils/validators.js';
+import { validatePostInput, parseFeedQuery } from '../utils/validators.js';
 
 /**
  * POST /api/posts — create a post containing text, an image, or both.
@@ -14,11 +14,20 @@ export async function createPost(req, res) {
 
 /**
  * GET /api/posts — the public feed.
+ * Supports ?page, ?limit, ?sort (latest | liked | commented) and ?search.
  */
 export async function getFeed(req, res) {
-  const posts = await postService.listPosts();
+  const { page, limit, sort, search } = parseFeedQuery(req.query);
 
-  res.json({ success: true, data: { posts } });
+  const { posts, pagination } = await postService.listPosts({
+    page,
+    limit,
+    sort,
+    search,
+    currentUserId: req.user?._id,
+  });
+
+  res.json({ success: true, data: { posts, pagination } });
 }
 
 /**

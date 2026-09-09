@@ -1,5 +1,6 @@
 import { Post } from '../models/Post.js';
 import { ApiError } from '../utils/ApiError.js';
+import { escapeRegex } from '../utils/validators.js';
 
 /**
  * Builds the author snapshot stored on a post from the authenticated user.
@@ -25,12 +26,72 @@ export async function createPost({ author, text, imageUrl }) {
   return post;
 }
 
+const SORT_STAGES = {
+  latest: { createdAt: -1 },
+  liked: { likeCount: -1, createdAt: -1 },
+  commented: { commentCount: -1, createdAt: -1 },
+};
+
 /**
- * Returns the most recent posts.
- * Pagination, sorting and search are layered on in the next step.
+ * Builds the feed.
+ *
+ * One aggregation does the whole job: it filters, derives the engagement
+ * counts, sorts by them, and returns the page alongside the total in a single
+ * round trip. Counts are computed here rather than stored on the document, so
+ * sorting by 'liked' can never disagree with the likes array itself.
+ *
+ * The comments array is left out of the response — it can be long, and the
+ * feed only needs its size. The likes array is small and is kept so the UI can
+ * name who liked a post.
  */
-export async function listPosts() {
-  return Post.find().sort({ createdAt: -1 }).limit(10);
+export async function listPosts({ page, limit, sort, search, currentUserId }) {
+  const pipeline = [];
+
+  if (search) {
+    const pattern = new RegExp(escapeRegex(search), 'i');
+    pipeline.push({
+      $match: {
+        $or: [{ text: pattern }, { 'author.username': pattern }, { 'author.name': pattern }],
+      },
+    });
+  }
+
+  pipeline.push({
+    $addFields: {
+      likeCount: { $size: '$likes' },
+      commentCount: { $size: '$comments' },
+      likedByMe: currentUserId ? { $in: [currentUserId, '$likes.userId'] } : false,
+    },
+  });
+
+  pipeline.push({
+    $facet: {
+      posts: [
+        { $sort: SORT_STAGES[sort] ?? SORT_STAGES.latest },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        { $project: { comments: 0 } },
+      ],
+      totalPosts: [{ $count: 'value' }],
+    },
+  });
+
+  const [result] = await Post.aggregate(pipeline);
+
+  const posts = result?.posts ?? [];
+  const totalPosts = result?.totalPosts?.[0]?.value ?? 0;
+  const totalPages = Math.ceil(totalPosts / limit);
+
+  return {
+    posts,
+    pagination: {
+      page,
+      limit,
+      totalPages,
+      totalPosts,
+      hasNextPage: page < totalPages,
+    },
+  };
 }
 
 export async function getPostById(postId) {
