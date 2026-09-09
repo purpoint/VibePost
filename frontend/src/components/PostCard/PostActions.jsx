@@ -4,9 +4,8 @@ import styles from './PostCard.module.css';
 /**
  * Like and comment controls.
  *
- * The counts and liked state come from the API. Wiring the buttons to the
- * like and comment endpoints is the next milestone's work; for now they carry
- * the authentication gate, so a logged-out visitor is sent to log in.
+ * The counts and liked state come from the API. The buttons carry the
+ * authentication gate, so a logged-out visitor is sent to log in.
  */
 export default function PostActions({ likeCount, commentCount, likedByMe, onLike, onComment }) {
   return (
