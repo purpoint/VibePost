@@ -14,9 +14,19 @@
   box-shadow: 0 0 0 3px var(--primary-soft);
 }
 
-.icon {
+.submit {
+  display: grid;
+  place-items: center;
   flex-shrink: 0;
+  padding: var(--space-1);
+  margin-inline-start: calc(var(--space-1) * -1);
   color: var(--text-muted);
+  border-radius: 50%;
+  transition: color var(--transition-fast);
+}
+
+.submit:hover {
+  color: var(--primary);
 }
 
 .input {

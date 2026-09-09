@@ -15,7 +15,11 @@ export default function SearchBar({ value, onChange, onSubmit, onClear }) {
 
   return (
     <form className={styles.wrapper} onSubmit={handleSubmit} role="search">
-      <Search className={styles.icon} size={18} aria-hidden="true" />
+      {/* A real submit button, so the magnifier is clickable and pressing
+          Enter in the field submits the form. */}
+      <button type="submit" className={styles.submit} aria-label="Search">
+        <Search size={18} aria-hidden="true" />
+      </button>
 
       <input
         type="search"
