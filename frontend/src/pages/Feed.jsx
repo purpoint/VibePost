@@ -13,6 +13,7 @@ import Button from '../components/Button/Button.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { postsApi } from '../services/api.js';
+import { useDebounce } from '../hooks/useDebounce.js';
 import styles from './Feed.module.css';
 
 /**
@@ -31,7 +32,6 @@ export default function Feed() {
   const [loadMoreError, setLoadMoreError] = useState('');
   const [sort, setSort] = useState('latest');
   const [searchInput, setSearchInput] = useState('');
-  const [activeSearch, setActiveSearch] = useState('');
   const [deletingId, setDeletingId] = useState(null);
   const [commentsFor, setCommentsFor] = useState(null);
 
@@ -39,6 +39,10 @@ export default function Feed() {
   // ignored until the first settles, so a rapid double-click cannot race two
   // toggles against each other.
   const likesInFlight = useRef(new Set());
+
+  // Searching happens as the reader types, once they pause. Submitting the
+  // form still works and simply runs the search that is already pending.
+  const activeSearch = useDebounce(searchInput.trim(), 400);
 
   const { user, isAuthenticated } = useAuth();
   const { showError, showSuccess } = useToast();
@@ -265,7 +269,6 @@ export default function Feed() {
 
   function clearSearch() {
     setSearchInput('');
-    setActiveSearch('');
   }
 
   return (
@@ -276,7 +279,7 @@ export default function Feed() {
         <SearchBar
           value={searchInput}
           onChange={setSearchInput}
-          onSubmit={() => setActiveSearch(searchInput.trim())}
+          onSubmit={loadFeed}
           onClear={clearSearch}
         />
 
@@ -286,7 +289,8 @@ export default function Feed() {
 
         {activeSearch && status === 'ready' && posts.length > 0 && (
           <p className={styles.resultSummary} role="status">
-            Showing results for “{activeSearch}”
+            {pagination?.totalPosts ?? posts.length}{' '}
+            {pagination?.totalPosts === 1 ? 'result' : 'results'} for “{activeSearch}”
           </p>
         )}
 
