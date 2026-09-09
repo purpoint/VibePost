@@ -1,0 +1,14 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.formError {
+  padding: var(--space-3) var(--space-4);
+  font-size: 13.5px;
+  color: var(--danger);
+  background-color: var(--danger-soft);
+  border: 1px solid rgba(255, 91, 103, 0.35);
+  border-radius: var(--radius-md);
+}

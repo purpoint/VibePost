@@ -34,3 +34,6 @@ coverage/
 .DS_Store
 Thumbs.db
 *.swp
+
+# local Claude Code tooling
+.claude/
