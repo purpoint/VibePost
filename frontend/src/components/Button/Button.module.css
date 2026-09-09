@@ -3,13 +3,30 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: 10px var(--space-5);
-  font-size: 15px;
+  /* Keeps every button a comfortable tap target on touch screens. */
+  min-height: 44px;
+  padding: 11px var(--space-6);
+  font-size: var(--text-base);
   font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
   border-radius: var(--radius-pill);
   border: 1px solid transparent;
   transition: background-color var(--transition-fast), border-color var(--transition-fast),
-    color var(--transition-fast), opacity var(--transition-fast);
+    color var(--transition-fast), opacity var(--transition-fast),
+    transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Icons are display:block globally, which would stack an icon above the label
+   inside this wrapper. Lay the wrapper out as a row instead. */
+.button > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .button:disabled {
@@ -24,10 +41,18 @@
 .primary {
   background-color: var(--primary);
   color: #ffffff;
+  box-shadow: 0 4px 14px rgba(22, 131, 255, 0.28);
 }
 
-.primary:hover:not(:disabled) {
-  background-color: var(--primary-hover);
+@media (hover: hover) {
+  .primary:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+    box-shadow: 0 6px 20px rgba(22, 131, 255, 0.4);
+  }
+}
+
+.primary:disabled {
+  box-shadow: none;
 }
 
 .ghost {
@@ -36,10 +61,12 @@
   color: var(--text-secondary);
 }
 
-.ghost:hover:not(:disabled) {
-  color: var(--text-primary);
-  background-color: var(--primary-soft);
-  border-color: var(--primary);
+@media (hover: hover) {
+  .ghost:hover:not(:disabled) {
+    color: var(--text-primary);
+    background-color: var(--primary-soft);
+    border-color: var(--primary);
+  }
 }
 
 .spinner {

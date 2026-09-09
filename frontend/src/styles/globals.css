@@ -9,7 +9,7 @@
   --background: #070d1a;
   --surface: #0d1424;
   --surface-raised: #121a2c;
-  --surface-hover: #17203608;
+  --surface-hover: #172036;
   --border: #202b42;
   --border-strong: #2c3a56;
 
@@ -49,6 +49,22 @@
   /* Motion */
   --transition-fast: 150ms ease;
   --transition-base: 200ms ease;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* Elevation — restrained, as the design spec asks */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 10px 24px rgba(0, 0, 0, 0.38);
+  --shadow-lg: 0 18px 44px rgba(0, 0, 0, 0.5);
+
+  /* Type scale */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 15.5px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
 
   /* Layout */
   --feed-max-width: 720px;
@@ -83,10 +99,18 @@ body {
   background-color: var(--background);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: var(--text-base);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* A very faint wash behind the feed keeps the near-black background from
+     reading as flat, without becoming a visible gradient. */
+  background-image: radial-gradient(
+    900px 520px at 50% -10%,
+    rgba(22, 131, 255, 0.07),
+    transparent 70%
+  );
+  background-attachment: fixed;
 }
 
 #root {
@@ -132,6 +156,7 @@ h3,
 h4 {
   line-height: 1.25;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 p,
@@ -150,6 +175,17 @@ h4 {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
+}
+
+/* Pointer users get hover feedback; keyboard users get the ring above. A
+   mouse click should not leave a ring behind on the element it pressed. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+::selection {
+  background-color: var(--primary);
+  color: #ffffff;
 }
 
 /* --------------------------------------------------------------------------

@@ -3,6 +3,13 @@
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: var(--space-5) var(--space-6);
+  }
 }
 
 .header {
@@ -59,7 +66,7 @@
 
 .footer {
   display: flex;
-  gap: var(--space-6);
+  justify-content: space-around;
   margin-block-start: var(--space-5);
   padding-block-start: var(--space-4);
   border-block-start: 1px solid var(--border);

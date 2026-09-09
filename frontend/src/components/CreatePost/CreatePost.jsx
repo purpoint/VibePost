@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ImagePlus, Smile, X } from 'lucide-react';
+import { ImagePlus, Send, Smile, X } from 'lucide-react';
 import Avatar from '../Avatar/Avatar.jsx';
 import Button from '../Button/Button.jsx';
 import EmojiPicker from './EmojiPicker.jsx';
@@ -183,6 +183,7 @@ export default function CreatePost({ onCreated }) {
         </div>
 
         <Button type="submit" loading={submitting} disabled={!canSubmit}>
+          {!submitting && <Send size={16} aria-hidden="true" />}
           {submitting ? 'Posting…' : 'Post'}
         </Button>
       </div>

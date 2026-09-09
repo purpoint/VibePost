@@ -3,11 +3,15 @@
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  transition: border-color var(--transition-base);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
-.card:hover {
-  border-color: var(--border-strong);
+@media (hover: hover) {
+  .card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-md);
+  }
 }
 
 /* ---------- header ---------- */
@@ -24,15 +28,16 @@
 }
 
 .name {
-  font-size: 15.5px;
+  font-size: var(--text-md);
   font-weight: 600;
+  letter-spacing: -0.01em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .meta {
-  font-size: 12.5px;
+  font-size: var(--text-xs);
   color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -97,8 +102,8 @@
 
 .text {
   margin-block-start: var(--space-4);
-  font-size: 15.5px;
-  line-height: 1.55;
+  font-size: var(--text-md);
+  line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -117,6 +122,16 @@
   width: 100%;
   max-height: 520px;
   object-fit: cover;
+}
+
+@media (hover: hover) {
+  .imageFrame:hover .image {
+    transform: scale(1.015);
+  }
+
+  .image {
+    transition: transform 300ms var(--ease-out);
+  }
 }
 
 .imageLoading {
@@ -150,6 +165,7 @@
 
 .actions {
   display: flex;
+  justify-content: space-around;
   gap: var(--space-2);
   margin-block-start: var(--space-5);
   padding-block-start: var(--space-3);
@@ -158,27 +174,57 @@
 
 .action {
   display: flex;
+  flex: 1;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2);
+  /* Comfortably past the 44px touch target minimum. */
+  min-height: 44px;
   padding: 8px var(--space-4);
   font-size: 14px;
   color: var(--text-secondary);
-  border-radius: var(--radius-pill);
-  transition: color var(--transition-fast), background-color var(--transition-fast);
+  border-radius: var(--radius-md);
+  transition: color var(--transition-fast), background-color var(--transition-fast),
+    transform var(--transition-fast);
 }
 
-.action:hover {
-  color: var(--text-primary);
-  background-color: var(--surface-raised);
+@media (hover: hover) {
+  .action:hover {
+    color: var(--text-primary);
+    background-color: var(--surface-raised);
+  }
+}
+
+.action:active {
+  transform: scale(0.96);
 }
 
 .liked {
   color: var(--danger);
 }
 
-.liked:hover {
-  color: var(--danger);
-  background-color: var(--danger-soft);
+@media (hover: hover) {
+  .liked:hover {
+    color: var(--danger);
+    background-color: var(--danger-soft);
+  }
+}
+
+/* A brief pulse the moment a post is liked, so the tap registers visually. */
+.liked svg {
+  animation: like-pop 260ms var(--ease-out);
+}
+
+@keyframes like-pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.28);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .count {

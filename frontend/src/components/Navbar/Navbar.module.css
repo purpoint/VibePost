@@ -28,7 +28,7 @@
 }
 
 .logo {
-  font-size: 22px;
+  font-size: var(--text-2xl);
   font-weight: 700;
   letter-spacing: -0.02em;
   background: linear-gradient(180deg, var(--text-primary), var(--primary));
@@ -38,7 +38,7 @@
 }
 
 .tagline {
-  font-size: 11.5px;
+  font-size: var(--text-xs);
   color: var(--text-muted);
   letter-spacing: 0.03em;
 }
@@ -50,15 +50,23 @@
 .avatarButton {
   display: block;
   border-radius: 50%;
-  transition: transform var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.avatarButton:hover {
-  transform: scale(1.05);
+@media (hover: hover) {
+  .avatarButton:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+}
+
+.avatarButton:active {
+  transform: scale(0.97);
 }
 
 .menu {
   position: absolute;
+  transform-origin: top right;
   top: calc(100% + var(--space-2));
   right: 0;
   min-width: 210px;
@@ -66,8 +74,8 @@
   background-color: var(--surface-raised);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
-  animation: menu-in var(--transition-fast);
+  box-shadow: var(--shadow-lg);
+  animation: menu-in 160ms var(--ease-out);
 }
 
 .identity {
@@ -109,7 +117,10 @@
 }
 
 .loginLink {
-  padding: 8px var(--space-4);
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px var(--space-5);
   font-size: 14px;
   font-weight: 600;
   color: var(--primary);
@@ -118,19 +129,21 @@
   transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 
-.loginLink:hover {
-  background-color: var(--primary-soft);
-  border-color: var(--primary);
+@media (hover: hover) {
+  .loginLink:hover {
+    background-color: var(--primary-soft);
+    border-color: var(--primary);
+  }
 }
 
 @keyframes menu-in {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-6px) scale(0.97);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -140,10 +153,10 @@
   }
 
   .logo {
-    font-size: 26px;
+    font-size: var(--text-3xl);
   }
 
   .tagline {
-    font-size: 12.5px;
+    font-size: var(--text-sm);
   }
 }

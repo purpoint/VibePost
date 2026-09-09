@@ -1,8 +1,8 @@
 .wrapper {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: 0 var(--space-4);
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-5);
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
@@ -14,28 +14,42 @@
   box-shadow: 0 0 0 3px var(--primary-soft);
 }
 
+/* The reference puts the magnifier in its own outlined circle to the right of
+   the field; it doubles as the visible way to run a search. */
 .submit {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  padding: var(--space-1);
-  margin-inline-start: calc(var(--space-1) * -1);
-  color: var(--text-muted);
+  order: 2;
+  width: 38px;
+  height: 38px;
+  color: var(--primary);
+  background-color: var(--primary-soft);
+  border: 1px solid transparent;
   border-radius: 50%;
-  transition: color var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast),
+    transform var(--transition-fast);
 }
 
-.submit:hover {
-  color: var(--primary);
+@media (hover: hover) {
+  .submit:hover {
+    background-color: rgba(22, 131, 255, 0.24);
+    border-color: var(--primary);
+  }
+}
+
+.submit:active {
+  transform: scale(0.94);
 }
 
 .input {
   flex: 1;
   min-width: 0;
+  order: 0;
   padding: 11px 0;
   background: none;
   border: none;
-  font-size: 15px;
+  font-size: var(--text-base);
 }
 
 .input:focus {
@@ -55,6 +69,7 @@
   display: grid;
   place-items: center;
   flex-shrink: 0;
+  order: 1;
   padding: var(--space-1);
   color: var(--text-muted);
   border-radius: 50%;

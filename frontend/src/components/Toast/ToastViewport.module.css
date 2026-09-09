@@ -21,13 +21,21 @@
   background-color: var(--surface-raised);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
-  animation: slide-in var(--transition-base);
+  box-shadow: var(--shadow-lg);
+  animation: slide-in 220ms var(--ease-out);
 }
 
 .icon {
   flex-shrink: 0;
   margin-block-start: 2px;
+}
+
+.error {
+  border-inline-start: 3px solid var(--danger);
+}
+
+.success {
+  border-inline-start: 3px solid var(--success);
 }
 
 .error .icon {
@@ -62,11 +70,11 @@
 @keyframes slide-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(12px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
