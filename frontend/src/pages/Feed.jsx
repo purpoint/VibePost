@@ -26,6 +26,9 @@ export default function Feed() {
   const [posts, setPosts] = useState([]);
   const [status, setStatus] = useState('loading');
   const [error, setError] = useState('');
+  const [pagination, setPagination] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState('');
   const [sort, setSort] = useState('latest');
   const [searchInput, setSearchInput] = useState('');
   const [activeSearch, setActiveSearch] = useState('');
@@ -41,12 +44,23 @@ export default function Feed() {
   const { showError, showSuccess } = useToast();
   const navigate = useNavigate();
 
+  /**
+   * Loads the first page. Runs whenever the sort or the search term changes,
+   * which also resets pagination — page 2 of one query has nothing to do with
+   * page 2 of another.
+   */
   const loadFeed = useCallback(async () => {
     setStatus('loading');
     setError('');
+    setLoadMoreError('');
     try {
-      const { posts: loaded } = await postsApi.list({ sort, search: activeSearch });
+      const { posts: loaded, pagination: page } = await postsApi.list({
+        page: 1,
+        sort,
+        search: activeSearch,
+      });
       setPosts(loaded);
+      setPagination(page);
       setStatus('ready');
     } catch (requestError) {
       setError(requestError.message);
@@ -57,6 +71,39 @@ export default function Feed() {
   useEffect(() => {
     loadFeed();
   }, [loadFeed]);
+
+  /**
+   * Appends the next page.
+   *
+   * Existing posts are kept on failure so a flaky request never costs the
+   * reader what they were already looking at; the error appears beside the
+   * button instead. Posts already on screen are filtered out of the incoming
+   * page, because a post created while paging would otherwise shift the
+   * offset and arrive twice.
+   */
+  async function handleLoadMore() {
+    if (loadingMore || !pagination?.hasNextPage) return;
+
+    setLoadingMore(true);
+    setLoadMoreError('');
+    try {
+      const { posts: nextPage, pagination: page } = await postsApi.list({
+        page: pagination.page + 1,
+        sort,
+        search: activeSearch,
+      });
+
+      setPosts((current) => {
+        const seen = new Set(current.map((post) => post._id));
+        return [...current, ...nextPage.filter((post) => !seen.has(post._id))];
+      });
+      setPagination(page);
+    } catch (requestError) {
+      setLoadMoreError(requestError.message);
+    } finally {
+      setLoadingMore(false);
+    }
+  }
 
   /** Sends a logged-out visitor to the login screen instead of the action. */
   const requireAuth = useCallback(
@@ -180,20 +227,39 @@ export default function Feed() {
     }
 
     return (
-      <div className={styles.list}>
-        {posts.map((post) => (
-          <PostCard
-            key={post._id}
-            post={post}
-            currentUserId={user?.id}
-            deleting={deletingId === post._id}
-            onDelete={handleDelete}
-            onLike={() => requireAuth(() => handleLike(post))}
-            // Reading comments is public; only writing one needs an account.
-            onComment={() => setCommentsFor(post)}
-          />
-        ))}
-      </div>
+      <>
+        <div className={styles.list}>
+          {posts.map((post) => (
+            <PostCard
+              key={post._id}
+              post={post}
+              currentUserId={user?.id}
+              deleting={deletingId === post._id}
+              onDelete={handleDelete}
+              onLike={() => requireAuth(() => handleLike(post))}
+              // Reading comments is public; only writing one needs an account.
+              onComment={() => setCommentsFor(post)}
+            />
+          ))}
+        </div>
+
+        {pagination?.hasNextPage && (
+          <div className={styles.loadMore}>
+            {loadMoreError && (
+              <p className={styles.loadMoreError} role="alert">
+                {loadMoreError}
+              </p>
+            )}
+            <Button variant="ghost" onClick={handleLoadMore} loading={loadingMore}>
+              {loadingMore ? 'Loading…' : 'Load more posts'}
+            </Button>
+          </div>
+        )}
+
+        {pagination && !pagination.hasNextPage && posts.length >= pagination.limit && (
+          <p className={styles.endOfFeed}>You&apos;re all caught up.</p>
+        )}
+      </>
     );
   }
 
