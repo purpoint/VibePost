@@ -31,6 +31,9 @@ const SORT_STAGES = {
   latest: { createdAt: -1 },
   liked: { likeCount: -1, createdAt: -1 },
   commented: { commentCount: -1, createdAt: -1 },
+  // Deliberately simple: what other people are engaging with, newest first
+  // among equals. No recommendation model, as the milestone doc asks.
+  foryou: { engagementScore: -1, createdAt: -1 },
 };
 
 /**
@@ -57,11 +60,19 @@ export async function listPosts({ page, limit, sort, search, currentUserId }) {
     });
   }
 
+  // 'For You' shows what others are posting, so a signed-in reader's own
+  // posts are left out. Signed out there is nobody to exclude, and the sort
+  // degrades to a plain engagement ranking.
+  if (sort === 'foryou' && currentUserId) {
+    pipeline.push({ $match: { 'author.userId': { $ne: currentUserId } } });
+  }
+
   pipeline.push({
     $addFields: {
       likeCount: { $size: '$likes' },
       commentCount: { $size: '$comments' },
       likedByMe: currentUserId ? { $in: [currentUserId, '$likes.userId'] } : false,
+      engagementScore: { $add: [{ $size: '$likes' }, { $size: '$comments' }] },
     },
   });
 

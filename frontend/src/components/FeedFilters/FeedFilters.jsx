@@ -6,6 +6,7 @@ import styles from './FeedFilters.module.css';
  */
 export const FEED_FILTERS = [
   { value: 'latest', label: 'All Posts' },
+  { value: 'foryou', label: 'For You' },
   { value: 'liked', label: 'Most Liked' },
   { value: 'commented', label: 'Most Commented' },
 ];

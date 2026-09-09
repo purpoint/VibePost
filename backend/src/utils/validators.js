@@ -70,7 +70,7 @@ export function validatePostInput(body = {}, { hasImage = false } = {}) {
   return { text };
 }
 
-export const FEED_SORTS = ['latest', 'liked', 'commented'];
+export const FEED_SORTS = ['latest', 'foryou', 'liked', 'commented'];
 const FEED_LIMIT_MAX = 50;
 const SEARCH_MAX_LENGTH = 100;
 
