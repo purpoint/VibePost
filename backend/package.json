@@ -1,13 +1,14 @@
 {
   "name": "vibepost-backend",
   "version": "1.0.0",
-  "description": "VibePost API — auth, posts, likes and comments",
+  "description": "VibePost API \u2014 auth, posts, likes and comments",
   "private": true,
   "type": "module",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "node --watch src/server.js",
+    "test": "node --test \"tests/**/*.test.js\""
   },
   "engines": {
     "node": ">=18"
@@ -22,5 +23,8 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.5",
     "multer": "^2.3.0"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^11.2.0"
   }
 }
