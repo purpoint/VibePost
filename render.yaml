@@ -1,0 +1,35 @@
+# Render blueprint for the VibePost API.
+#
+# Every secret is declared with `sync: false`, which tells Render to expect the
+# value from the dashboard and never from this file. Nothing sensitive belongs
+# in version control.
+services:
+  - type: web
+    name: vibepost-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Render supplies PORT itself; the server reads process.env.PORT.
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      # The deployed frontend origin, e.g. https://vibepost.vercel.app
+      - key: CLIENT_URL
+        sync: false
+      - key: AUTH_RATE_LIMIT_MAX
+        value: "20"
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
