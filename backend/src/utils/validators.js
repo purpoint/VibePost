@@ -47,3 +47,39 @@ export function validateLoginInput(body = {}) {
   const password = requireString(body.password, 'Password');
   return { email, password };
 }
+
+export const POST_TEXT_MAX_LENGTH = 1000;
+
+/**
+ * Accepts only absolute http(s) URLs.
+ * Rejecting anything else keeps javascript: and data: URIs out of the feed,
+ * where they would be rendered straight into an <img> for every visitor.
+ */
+function isSafeImageUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Validates a create-post payload. A post needs text, an image, or both.
+ */
+export function validatePostInput(body = {}) {
+  const text = typeof body.text === 'string' ? body.text.trim() : '';
+  const imageUrl = typeof body.imageUrl === 'string' ? body.imageUrl.trim() : '';
+
+  if (!text && !imageUrl) {
+    throw ApiError.badRequest('Post text or image is required');
+  }
+  if (text.length > POST_TEXT_MAX_LENGTH) {
+    throw ApiError.badRequest(`Post must be at most ${POST_TEXT_MAX_LENGTH} characters`);
+  }
+  if (imageUrl && !isSafeImageUrl(imageUrl)) {
+    throw ApiError.badRequest('Image URL must be a valid http or https address');
+  }
+
+  return { text, imageUrl };
+}
