@@ -4,6 +4,7 @@ import { Inbox, SearchX, WifiOff } from 'lucide-react';
 import Navbar from '../components/Navbar/Navbar.jsx';
 import SearchBar from '../components/SearchBar/SearchBar.jsx';
 import FeedFilters from '../components/FeedFilters/FeedFilters.jsx';
+import CreatePost from '../components/CreatePost/CreatePost.jsx';
 import PostCard from '../components/PostCard/PostCard.jsx';
 import PostSkeleton from '../components/PostSkeleton/PostSkeleton.jsx';
 import EmptyState from '../components/EmptyState/EmptyState.jsx';
@@ -61,6 +62,12 @@ export default function Feed() {
     },
     [isAuthenticated, navigate]
   );
+
+  /** A new post appears at the top of the feed immediately, with no refetch. */
+  function handleCreated(post) {
+    setPosts((current) => [post, ...current]);
+    showSuccess('Your post is live.');
+  }
 
   async function handleDelete(post) {
     setDeletingId(post._id);
@@ -153,6 +160,8 @@ export default function Feed() {
           onSubmit={() => setActiveSearch(searchInput.trim())}
           onClear={clearSearch}
         />
+
+        <CreatePost onCreated={handleCreated} />
 
         <FeedFilters value={sort} onChange={setSort} />
 
