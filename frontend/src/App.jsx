@@ -2,7 +2,6 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import ToastViewport from './components/Toast/ToastViewport.jsx';
-import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.jsx';
 import Loader from './components/Loader/Loader.jsx';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
@@ -41,14 +40,9 @@ function AppRoutes() {
           </GuestOnlyRoute>
         }
       />
-      <Route
-        path="/feed"
-        element={
-          <ProtectedRoute>
-            <Feed />
-          </ProtectedRoute>
-        }
-      />
+      {/* The feed is public: anyone can read it, while posting, liking and
+          commenting send a logged-out visitor to the login screen. */}
+      <Route path="/feed" element={<Feed />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

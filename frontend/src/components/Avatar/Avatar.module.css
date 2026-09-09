@@ -1,0 +1,13 @@
+.avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  user-select: none;
+  background-color: var(--avatar-bg, var(--surface-raised));
+  color: var(--avatar-fg, var(--text-primary));
+  border: 1px solid var(--border);
+}

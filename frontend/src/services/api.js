@@ -24,6 +24,13 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Let the browser set multipart/form-data itself: it has to append the
+  // boundary, which the JSON default would overwrite.
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type'];
+  }
+
   return config;
 });
 
@@ -58,6 +65,26 @@ api.interceptors.response.use(
 );
 
 const unwrap = (response) => response.data.data;
+
+export const postsApi = {
+  list: ({ page = 1, limit = 10, sort = 'latest', search = '' } = {}) =>
+    api.get('/posts', { params: { page, limit, sort, ...(search ? { search } : {}) } }).then(unwrap),
+
+  get: (id) => api.get(`/posts/${id}`).then(unwrap),
+
+  /**
+   * Creates a post. Sent as multipart so an image file can ride along; the
+   * backend accepts the same shape with or without one.
+   */
+  create: ({ text = '', imageFile = null }) => {
+    const form = new FormData();
+    if (text) form.append('text', text);
+    if (imageFile) form.append('image', imageFile);
+    return api.post('/posts', form).then(unwrap);
+  },
+
+  remove: (id) => api.delete(`/posts/${id}`).then(unwrap),
+};
 
 export const authApi = {
   signup: (payload) => api.post('/auth/signup', payload).then(unwrap),
