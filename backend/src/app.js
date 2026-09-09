@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { databaseState } from './config/db.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 
@@ -44,7 +45,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Feature routes are mounted in later milestones.
+app.use('/api/auth', authRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
