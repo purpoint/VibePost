@@ -3,7 +3,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { databaseState } from './config/db.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
-import { authRateLimiter } from './middleware/rateLimitMiddleware.js';
 import { ApiError } from './utils/ApiError.js';
 import authRoutes from './routes/authRoutes.js';
 import postRoutes from './routes/postRoutes.js';
@@ -55,7 +54,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-app.use('/api/auth', authRateLimiter, authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 
 app.use(notFound);

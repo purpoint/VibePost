@@ -39,3 +39,20 @@ describe('rate limiting', () => {
     assert.equal(feed.status, 200, 'throttling credentials must not take the feed down');
   });
 });
+
+describe('rate limiting scope', () => {
+  it('does not throttle session checks', async () => {
+    // /api/auth/me runs on every page load. Throttling it would lock out
+    // ordinary users sharing an outbound address behind NAT, so the limiter
+    // must cover only the endpoints that accept credentials.
+    const results = [];
+    for (let i = 0; i < 12; i += 1) {
+      results.push(await api.request('GET', '/api/auth/me'));
+    }
+
+    assert.ok(
+      results.every((res) => res.status === 401),
+      `session checks were throttled: ${[...new Set(results.map((r) => r.status))].join(', ')}`
+    );
+  });
+});

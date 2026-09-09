@@ -319,7 +319,12 @@ section('feed controls');
   const page1 = await call('GET', '/api/posts?page=1&limit=2');
   const page2 = await call('GET', '/api/posts?page=2&limit=2');
   const ids = [...(page1.body?.data?.posts ?? []), ...(page2.body?.data?.posts ?? [])].map((p) => p._id);
-  check('pagination returns the requested size', page1.body?.data?.posts?.length === 2);
+  // A fresh database can hold fewer posts than one page, so the expected size
+  // is whichever is smaller: the page limit or the total.
+  const total = page1.body?.data?.pagination?.totalPosts ?? 0;
+  check('pagination returns the expected page size',
+    page1.body?.data?.posts?.length === Math.min(2, total),
+    `got=${page1.body?.data?.posts?.length} expected=${Math.min(2, total)} total=${total}`);
   check('pages do not repeat a post', new Set(ids).size === ids.length, ids.join(','));
   check('pagination reports totals', typeof page1.body?.data?.pagination?.totalPosts === 'number');
 
