@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar/Navbar.jsx';
 import SearchBar from '../components/SearchBar/SearchBar.jsx';
 import FeedFilters from '../components/FeedFilters/FeedFilters.jsx';
 import CreatePost from '../components/CreatePost/CreatePost.jsx';
+import CommentModal from '../components/CommentModal/CommentModal.jsx';
 import PostCard from '../components/PostCard/PostCard.jsx';
 import PostSkeleton from '../components/PostSkeleton/PostSkeleton.jsx';
 import EmptyState from '../components/EmptyState/EmptyState.jsx';
@@ -29,6 +30,7 @@ export default function Feed() {
   const [searchInput, setSearchInput] = useState('');
   const [activeSearch, setActiveSearch] = useState('');
   const [deletingId, setDeletingId] = useState(null);
+  const [commentsFor, setCommentsFor] = useState(null);
 
   // Posts with a like request in flight. A second click on the same post is
   // ignored until the first settles, so a rapid double-click cannot race two
@@ -103,6 +105,12 @@ export default function Feed() {
     }
   }
 
+  /** Keeps a card's comment count in step with the modal. */
+  const handleCommentCount = useCallback(
+    (postId, commentCount) => patchPost(postId, { commentCount }),
+    [patchPost]
+  );
+
   /** A new post appears at the top of the feed immediately, with no refetch. */
   function handleCreated(post) {
     setPosts((current) => [post, ...current]);
@@ -175,7 +183,8 @@ export default function Feed() {
             deleting={deletingId === post._id}
             onDelete={handleDelete}
             onLike={() => requireAuth(() => handleLike(post))}
-            onComment={() => requireAuth(() => {})}
+            // Reading comments is public; only writing one needs an account.
+            onComment={() => setCommentsFor(post)}
           />
         ))}
       </div>
@@ -211,6 +220,14 @@ export default function Feed() {
 
         {renderFeed()}
       </main>
+
+      {commentsFor && (
+        <CommentModal
+          post={commentsFor}
+          onClose={() => setCommentsFor(null)}
+          onCountChange={handleCommentCount}
+        />
+      )}
     </div>
   );
 }
