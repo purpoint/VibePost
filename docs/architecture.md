@@ -429,9 +429,15 @@ Sorting:
 
 ``` text
 latest     → createdAt descending
+foryou     → engagement descending, excluding the reader's own posts
 liked      → likes.length descending
 commented  → comments.length descending
 ```
+
+Every sort ends with `_id` descending as a tiebreaker. Without it the ordering
+is not total — posts created in the same millisecond tie on `createdAt`, and
+the engagement sorts tie constantly — and paginated queries could then repeat
+or skip a post.
 
 For search:
 

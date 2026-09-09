@@ -79,26 +79,127 @@ The app starts on `http://localhost:5173`.
 
 ## Environment Variables
 
+Real `.env` files are never committed — only `.env.example`. In production the
+same variables are set in the Render and Vercel dashboards.
+
 ### `backend/.env`
 
-| Variable | Description |
-| --- | --- |
-| `PORT` | Port the API listens on (defaults to 5000) |
-| `MONGODB_URI` | MongoDB Atlas connection string |
-| `JWT_SECRET` | Secret used to sign JWTs |
-| `JWT_EXPIRES_IN` | Token lifetime, e.g. `7d` |
-| `CLIENT_URL` | Allowed CORS origin(s), comma-separated |
-| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
-| `CLOUDINARY_API_KEY` | Cloudinary API key |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret |
+| Variable | Required | Description |
+| --- | --- | --- |
+| `PORT` | no | Local port (defaults to 5000). Render supplies its own. |
+| `MONGODB_URI` | yes | MongoDB Atlas connection string |
+| `JWT_SECRET` | yes | Secret used to sign JWTs — 32+ random characters |
+| `JWT_EXPIRES_IN` | no | Token lifetime, defaults to `7d` |
+| `CLIENT_URL` | in production | Allowed browser origin(s), comma-separated, no trailing slash |
+| `NODE_ENV` | in production | Set to `production` so internal error detail is masked |
+| `AUTH_RATE_LIMIT_MAX` | no | Credential attempts per IP per 15 minutes (defaults to 20) |
+| `CLOUDINARY_CLOUD_NAME` | for images | Cloudinary cloud name |
+| `CLOUDINARY_API_KEY` | for images | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | for images | Cloudinary API secret — server only, never sent to the browser |
+
+The API refuses to start in production if `CLIENT_URL` is missing, still points
+at localhost, carries a path or trailing slash, or if `JWT_SECRET` is the
+example value. Without Cloudinary credentials the API still runs and text posts
+work; only image uploads report that storage is unconfigured.
 
 ### `frontend/.env`
 
-| Variable | Description |
-| --- | --- |
-| `VITE_API_URL` | Base URL of the API, e.g. `http://localhost:5000/api` |
+| Variable | Required | Description |
+| --- | --- | --- |
+| `VITE_API_URL` | yes | Base URL of the API, including `/api` |
 
-Real `.env` files are never committed — only `.env.example`.
+Vite inlines this at build time, so it must be set **when the build runs**.
+`npm run build` inspects the output and refuses to ship a bundle that still
+contains the development fallback when building on a deployment platform.
+
+---
+
+## Deployment
+
+Three services: the database on MongoDB Atlas, the API on Render, the client on
+Vercel. Images live on Cloudinary. Each holds its own credentials; nothing
+sensitive is in this repository.
+
+```
+Vercel (React)  ──HTTPS──▶  Render (Express)  ──▶  MongoDB Atlas
+                                   │
+                                   └──▶  Cloudinary (post images)
+```
+
+### 1. MongoDB Atlas
+
+1. Create a free cluster and a database user with a strong password.
+2. Under **Network Access**, allow Render to connect. Render's outbound
+   addresses are not fixed on the free plan, so `0.0.0.0/0` with a strong
+   password is the practical option.
+3. Copy the connection string and append the database name, e.g.
+   `...mongodb.net/vibepost?retryWrites=true&w=majority`.
+
+The application creates exactly two collections, `users` and `posts`. Likes and
+comments are embedded inside post documents, not stored separately.
+
+### 2. Cloudinary
+
+1. Create an account; the dashboard shows the cloud name, API key and API
+   secret.
+2. Put all three in the Render environment. The secret is only ever used by the
+   API to sign uploads — the browser posts files to VibePost's own endpoint and
+   never talks to Cloudinary directly.
+
+### 3. Render (API)
+
+The repository contains a `render.yaml` blueprint, so **New → Blueprint** picks
+up the settings. To configure it by hand instead:
+
+| Setting | Value |
+| --- | --- |
+| Root directory | `backend` |
+| Build command | `npm ci` |
+| Start command | `npm start` |
+| Health check path | `/api/health` |
+
+Then set the environment variables from the backend table above. `CLIENT_URL`
+must be the deployed frontend origin, e.g. `https://vibepost.vercel.app` — no
+trailing slash, or it will never match a browser's `Origin` header.
+
+Confirm the service is healthy:
+
+```bash
+curl https://<your-api>.onrender.com/api/health
+```
+
+`database` should read `connected`.
+
+> Render's free tier sleeps after inactivity, so the first request after an idle
+> period can take up to a minute.
+
+### 4. Vercel (client)
+
+| Setting | Value |
+| --- | --- |
+| Root directory | `frontend` |
+| Framework preset | Vite |
+| Build command | `npm run build` |
+| Output directory | `dist` |
+
+Set `VITE_API_URL` to the deployed API including `/api`, e.g.
+`https://vibepost-api.onrender.com/api`, then redeploy so the value is baked in.
+
+`frontend/vercel.json` rewrites unmatched paths to `index.html`, so refreshing
+on `/feed` or opening a direct link is handled by React Router instead of
+returning 404.
+
+### 5. Verify the deployment
+
+```bash
+cd backend && npm run smoke -- https://<your-api>.onrender.com
+```
+
+This exercises the live API: auth, posts, image uploads, likes, comments, the
+feed controls and the security behaviour, then deletes the posts it created. It
+leaves behind two throwaway accounts, which it names at the end — there is no
+account-deletion endpoint, so remove them from Atlas if you want a clean
+database.
 
 ---
 
