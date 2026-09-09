@@ -22,7 +22,9 @@
   /* Text */
   --text-primary: #f5f7fb;
   --text-secondary: #a5adbd;
-  --text-muted: #6f788b;
+  /* Lightened from #6f788b, which measured 4.14:1 on the card surface and
+     missed the 4.5:1 AA threshold for the small metadata text that uses it. */
+  --text-muted: #7b8497;
 
   /* Status */
   --success: #39d98a;

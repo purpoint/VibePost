@@ -37,10 +37,14 @@ export default function Navbar() {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <Link to="/feed" className={styles.brand}>
-          <span className={styles.logo}>VibePost</span>
-          <span className={styles.tagline}>Share. Connect. Engage.</span>
-        </Link>
+        {/* The wordmark is the page's h1: every other heading on the feed
+            sits beneath it. */}
+        <h1 className={styles.brandHeading}>
+          <Link to="/feed" className={styles.brand}>
+            <span className={styles.logo}>VibePost</span>
+            <span className={styles.tagline}>Share. Connect. Engage.</span>
+          </Link>
+        </h1>
 
         {isAuthenticated ? (
           <div className={styles.account} ref={menuRef}>

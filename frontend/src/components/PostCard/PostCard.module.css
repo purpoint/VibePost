@@ -52,20 +52,38 @@
 .iconButton {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   color: var(--text-muted);
   border-radius: 50%;
-  transition: color var(--transition-fast), background-color var(--transition-fast);
+  transition: color var(--transition-fast), background-color var(--transition-fast),
+    transform var(--transition-fast);
 }
 
-.iconButton:hover {
-  color: var(--text-primary);
-  background-color: var(--surface-raised);
+@media (hover: hover) {
+  .iconButton:hover {
+    color: var(--text-primary);
+    background-color: var(--surface-raised);
+  }
+}
+
+.iconButton:active {
+  transform: scale(0.94);
+}
+
+/* Touch pointers get a full-size target; a 36px circle is fine for a mouse
+   but small for a thumb. */
+@media (pointer: coarse) {
+  .iconButton {
+    width: 44px;
+    height: 44px;
+  }
 }
 
 .menu {
   position: absolute;
+  transform-origin: top right;
+  animation: menu-in 160ms var(--ease-out);
   top: calc(100% + var(--space-1));
   right: 0;
   min-width: 170px;
@@ -73,8 +91,19 @@
   background-color: var(--surface-raised);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lg);
   z-index: 10;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .deleteItem {
@@ -89,8 +118,14 @@
   transition: background-color var(--transition-fast);
 }
 
-.deleteItem:hover:not(:disabled) {
-  background-color: var(--danger-soft);
+@media (hover: hover) {
+  .deleteItem:hover:not(:disabled) {
+    background-color: var(--danger-soft);
+  }
+}
+
+.deleteItem {
+  min-height: 44px;
 }
 
 .deleteItem:disabled {

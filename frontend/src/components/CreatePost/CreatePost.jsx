@@ -142,6 +142,9 @@ export default function CreatePost({ onCreated }) {
 
       <div className={styles.footer}>
         <div className={styles.tools}>
+          <label className="visually-hidden" htmlFor="post-image">
+            Attach an image
+          </label>
           <input
             ref={fileInputRef}
             type="file"
@@ -149,6 +152,9 @@ export default function CreatePost({ onCreated }) {
             accept={ACCEPTED_TYPES.join(',')}
             onChange={handleFileChange}
             id="post-image"
+            /* Operated through the button below; keeping it out of the tab
+               order stops keyboard users landing on a control they cannot see. */
+            tabIndex={-1}
           />
           <button
             type="button"

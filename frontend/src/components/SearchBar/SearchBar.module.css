@@ -42,6 +42,13 @@
   transform: scale(0.94);
 }
 
+@media (pointer: coarse) {
+  .submit {
+    width: 44px;
+    height: 44px;
+  }
+}
+
 .input {
   flex: 1;
   min-width: 0;
@@ -76,7 +83,16 @@
   transition: color var(--transition-fast), background-color var(--transition-fast);
 }
 
-.clear:hover {
-  color: var(--text-primary);
-  background-color: var(--surface-raised);
+@media (hover: hover) {
+  .clear:hover {
+    color: var(--text-primary);
+    background-color: var(--surface-raised);
+  }
+}
+
+@media (pointer: coarse) {
+  .clear {
+    width: 40px;
+    height: 40px;
+  }
 }

@@ -18,6 +18,13 @@
   padding-block-start: max(var(--space-3), env(safe-area-inset-top));
 }
 
+.brandHeading {
+  /* The heading is structural only; the wordmark inside carries the styling. */
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
 .brand {
   display: flex;
   flex-direction: column;
@@ -104,6 +111,7 @@
   align-items: center;
   gap: var(--space-3);
   width: 100%;
+  min-height: 44px;
   margin-block-start: var(--space-1);
   padding: var(--space-3);
   font-size: 14px;
@@ -112,9 +120,11 @@
   transition: color var(--transition-fast), background-color var(--transition-fast);
 }
 
-.menuItem:hover {
-  color: var(--text-primary);
-  background-color: var(--primary-soft);
+@media (hover: hover) {
+  .menuItem:hover {
+    color: var(--text-primary);
+    background-color: var(--primary-soft);
+  }
 }
 
 .loginLink {

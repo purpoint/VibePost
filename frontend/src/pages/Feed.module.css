@@ -2,6 +2,29 @@
   min-height: 100vh;
 }
 
+/* Lets a keyboard user jump past the header straight to the posts. Hidden
+   until it takes focus. */
+.skipLink {
+  position: absolute;
+  top: var(--space-2);
+  left: 50%;
+  z-index: 60;
+  padding: 10px var(--space-5);
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--primary);
+  border-radius: var(--radius-pill);
+  transform: translate(-50%, -200%);
+  transition: transform var(--transition-base);
+}
+
+/* :focus rather than :focus-visible — the link must appear for anyone who
+   lands on it, whatever the browser decides about focus modality. */
+.skipLink:focus {
+  transform: translate(-50%, 0);
+}
+
 .main {
   display: flex;
   flex-direction: column;

@@ -273,9 +273,13 @@ export default function Feed() {
 
   return (
     <div className={styles.page}>
+      <a className={styles.skipLink} href="#feed-content">
+        Skip to posts
+      </a>
+
       <Navbar />
 
-      <main className={styles.main}>
+      <main className={styles.main} id="feed-content" aria-busy={status === 'loading'}>
         <SearchBar
           value={searchInput}
           onChange={setSearchInput}
