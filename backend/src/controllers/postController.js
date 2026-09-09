@@ -1,6 +1,7 @@
 import * as postService from '../services/postService.js';
 import { validatePostInput, parseFeedQuery } from '../utils/validators.js';
 import { uploadImage, destroyImage } from '../config/cloudinary.js';
+import { assertIsRealImage } from '../utils/imageInspector.js';
 
 /**
  * POST /api/posts — create a post containing text, an image, or both.
@@ -16,6 +17,8 @@ export async function createPost(req, res) {
   let publicId = '';
 
   if (req.file) {
+    // The declared content type came from the client; check the bytes.
+    assertIsRealImage(req.file.buffer);
     ({ url: imageUrl, publicId } = await uploadImage(req.file.buffer));
   }
 

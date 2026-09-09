@@ -102,6 +102,30 @@ Real `.env` files are never committed — only `.env.example`.
 
 ---
 
+## Image Uploads
+
+Post images are stored on Cloudinary, never in MongoDB and never on the API
+server's disk — Render wipes its filesystem on every deploy, which would take
+uploaded files with it. The post document keeps only the hosted URL.
+
+`POST /api/posts` accepts either plain JSON for a text-only post, or
+`multipart/form-data` with an optional `image` file:
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `text` | string | Optional if an image is attached; max 1000 characters |
+| `image` | file | Optional if text is given; JPG, PNG, WEBP or GIF, max 5MB |
+
+A post must carry text, an image, or both — a request with neither is rejected.
+Uploads are checked twice: the declared content type must be on the allowlist,
+and the file's actual leading bytes must match a supported image format, so a
+script renamed `.png` is refused.
+
+Without Cloudinary credentials the API still runs and text-only posts work
+normally; only an attempted upload reports that storage is unconfigured.
+
+---
+
 ## Documentation
 
 Specification documents live in [`docs/`](./docs):
