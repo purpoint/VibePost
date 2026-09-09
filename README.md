@@ -59,7 +59,10 @@ cp .env.example .env   # then fill in your own values
 npm run dev
 ```
 
-The API starts on `http://localhost:5000`.
+The API starts on `http://localhost:5050`.
+
+> On macOS, port 5000 is taken by the AirPlay Receiver, so VibePost defaults to 5050 locally.
+> Render supplies its own `PORT` in production.
 
 ### 3. Frontend
 
