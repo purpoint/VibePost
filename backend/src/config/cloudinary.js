@@ -52,8 +52,27 @@ export function uploadImage(buffer) {
       { folder: FOLDER, resource_type: 'image' },
       (error, result) => {
         if (error || !result?.secure_url) {
-          // The provider's own message is not shown to the user.
-          console.error('[cloudinary] upload failed:', error?.message ?? 'no result returned');
+          const status = error?.http_code ?? error?.error?.http_code;
+
+          // The provider's own message is logged, never shown to the user.
+          console.error(
+            '[cloudinary] upload failed:',
+            `status=${status ?? 'unknown'}`,
+            error?.message ?? error?.error?.message ?? 'no result returned'
+          );
+
+          // 401 and 403 are configuration problems, not hiccups. Saying
+          // "try again" for those sends whoever reads the log chasing a
+          // transient fault that will never clear on its own.
+          if (status === 401 || status === 403) {
+            console.error(
+              '[cloudinary] this is a credentials or permissions problem, not a transient failure.',
+              'Check that the API key is for this cloud and is allowed to create assets.'
+            );
+            reject(new ApiError(502, 'Image uploads are misconfigured on this server.'));
+            return;
+          }
+
           reject(new ApiError(502, 'Uploading your image failed. Please try again.'));
           return;
         }
