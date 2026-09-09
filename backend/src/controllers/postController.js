@@ -1,15 +1,33 @@
 import * as postService from '../services/postService.js';
 import { validatePostInput, parseFeedQuery } from '../utils/validators.js';
+import { uploadImage, destroyImage } from '../config/cloudinary.js';
 
 /**
  * POST /api/posts — create a post containing text, an image, or both.
+ *
+ * Accepts multipart/form-data with an optional `image` file, or plain JSON for
+ * a text-only post. The request is fully validated before anything is
+ * uploaded, so a rejected post never leaves a file behind at the provider.
  */
 export async function createPost(req, res) {
-  const { text, imageUrl } = validatePostInput(req.body);
+  const { text } = validatePostInput(req.body, { hasImage: Boolean(req.file) });
 
-  const post = await postService.createPost({ author: req.user, text, imageUrl });
+  let imageUrl = '';
+  let publicId = '';
 
-  res.status(201).json({ success: true, data: { post } });
+  if (req.file) {
+    ({ url: imageUrl, publicId } = await uploadImage(req.file.buffer));
+  }
+
+  try {
+    const post = await postService.createPost({ author: req.user, text, imageUrl });
+    res.status(201).json({ success: true, data: { post } });
+  } catch (error) {
+    // The image is already hosted but has no post pointing at it — remove it
+    // rather than leaving an orphan behind.
+    await destroyImage(publicId);
+    throw error;
+  }
 }
 
 /**

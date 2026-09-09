@@ -51,37 +51,23 @@ export function validateLoginInput(body = {}) {
 export const POST_TEXT_MAX_LENGTH = 1000;
 
 /**
- * Accepts only absolute http(s) URLs.
- * Rejecting anything else keeps javascript: and data: URIs out of the feed,
- * where they would be rendered straight into an <img> for every visitor.
+ * Validates the text half of a create-post request.
+ *
+ * A post needs text, an image, or both. The image itself arrives as an
+ * uploaded file rather than a URL, so whether one is present is decided by the
+ * upload middleware and passed in here.
  */
-function isSafeImageUrl(value) {
-  try {
-    const url = new URL(value);
-    return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Validates a create-post payload. A post needs text, an image, or both.
- */
-export function validatePostInput(body = {}) {
+export function validatePostInput(body = {}, { hasImage = false } = {}) {
   const text = typeof body.text === 'string' ? body.text.trim() : '';
-  const imageUrl = typeof body.imageUrl === 'string' ? body.imageUrl.trim() : '';
 
-  if (!text && !imageUrl) {
+  if (!text && !hasImage) {
     throw ApiError.badRequest('Post text or image is required');
   }
   if (text.length > POST_TEXT_MAX_LENGTH) {
     throw ApiError.badRequest(`Post must be at most ${POST_TEXT_MAX_LENGTH} characters`);
   }
-  if (imageUrl && !isSafeImageUrl(imageUrl)) {
-    throw ApiError.badRequest('Image URL must be a valid http or https address');
-  }
 
-  return { text, imageUrl };
+  return { text };
 }
 
 export const FEED_SORTS = ['latest', 'liked', 'commented'];
