@@ -4,7 +4,11 @@ import AuthLayout from '../components/AuthLayout/AuthLayout.jsx';
 import FormField from '../components/FormField/FormField.jsx';
 import Button from '../components/Button/Button.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
-import { validateSignupForm, PASSWORD_MIN_LENGTH } from '../utils/validators.js';
+import {
+  validateSignupForm,
+  mapServerErrorToField,
+  PASSWORD_MIN_LENGTH,
+} from '../utils/validators.js';
 import styles from './AuthForm.module.css';
 
 const EMPTY_FORM = { name: '', username: '', email: '', password: '' };
@@ -42,7 +46,10 @@ export default function Signup() {
       });
       navigate('/feed', { replace: true });
     } catch (error) {
-      setFormError(error.message);
+      // Point at the offending field when the server names one.
+      const fieldError = mapServerErrorToField(error.message);
+      if (fieldError) setErrors(fieldError);
+      else setFormError(error.message);
     } finally {
       setSubmitting(false);
     }
@@ -65,49 +72,51 @@ export default function Signup() {
           </p>
         )}
 
-        <FormField
-          label="Name"
-          name="name"
-          autoComplete="name"
-          placeholder="Manan Patel"
-          value={form.name}
-          onChange={updateField('name')}
-          error={errors.name}
-        />
+        <fieldset className={styles.fields} disabled={submitting}>
+          <FormField
+            label="Name"
+            name="name"
+            autoComplete="name"
+            placeholder="Manan Patel"
+            value={form.name}
+            onChange={updateField('name')}
+            error={errors.name}
+          />
 
-        <FormField
-          label="Username"
-          name="username"
-          autoComplete="username"
-          placeholder="manan"
-          value={form.username}
-          onChange={updateField('username')}
-          error={errors.username}
-          hint="Letters, numbers and underscores only"
-        />
+          <FormField
+            label="Username"
+            name="username"
+            autoComplete="username"
+            placeholder="manan"
+            value={form.username}
+            onChange={updateField('username')}
+            error={errors.username}
+            hint="Letters, numbers and underscores only"
+          />
 
-        <FormField
-          label="Email"
-          type="email"
-          name="email"
-          autoComplete="email"
-          placeholder="you@example.com"
-          value={form.email}
-          onChange={updateField('email')}
-          error={errors.email}
-        />
+          <FormField
+            label="Email"
+            type="email"
+            name="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={form.email}
+            onChange={updateField('email')}
+            error={errors.email}
+          />
 
-        <FormField
-          label="Password"
-          type="password"
-          name="password"
-          autoComplete="new-password"
-          placeholder="Choose a password"
-          value={form.password}
-          onChange={updateField('password')}
-          error={errors.password}
-          hint={`At least ${PASSWORD_MIN_LENGTH} characters`}
-        />
+          <FormField
+            label="Password"
+            type="password"
+            name="password"
+            autoComplete="new-password"
+            placeholder="Choose a password"
+            value={form.password}
+            onChange={updateField('password')}
+            error={errors.password}
+            hint={`At least ${PASSWORD_MIN_LENGTH} characters`}
+          />
+        </fieldset>
 
         <Button type="submit" fullWidth loading={submitting}>
           {submitting ? 'Creating account…' : 'Create Account'}

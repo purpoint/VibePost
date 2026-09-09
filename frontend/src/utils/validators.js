@@ -42,3 +42,18 @@ export function validateSignupForm({ name, username, email, password }) {
 
   return errors;
 }
+
+/**
+ * Maps a server error message onto the field it concerns, so a rejected signup
+ * points at the input the user has to change instead of only showing a banner.
+ * Returns null when the message is not field-specific.
+ */
+export function mapServerErrorToField(message = '') {
+  if (/email/i.test(message) && /exists|taken|registered/i.test(message)) {
+    return { email: message };
+  }
+  if (/username/i.test(message) && /exists|taken/i.test(message)) {
+    return { username: message };
+  }
+  return null;
+}

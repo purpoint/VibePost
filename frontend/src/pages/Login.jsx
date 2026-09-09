@@ -62,27 +62,29 @@ export default function Login() {
           </p>
         )}
 
-        <FormField
-          label="Email"
-          type="email"
-          name="email"
-          autoComplete="email"
-          placeholder="you@example.com"
-          value={form.email}
-          onChange={updateField('email')}
-          error={errors.email}
-        />
+        <fieldset className={styles.fields} disabled={submitting}>
+          <FormField
+            label="Email"
+            type="email"
+            name="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={form.email}
+            onChange={updateField('email')}
+            error={errors.email}
+          />
 
-        <FormField
-          label="Password"
-          type="password"
-          name="password"
-          autoComplete="current-password"
-          placeholder="Your password"
-          value={form.password}
-          onChange={updateField('password')}
-          error={errors.password}
-        />
+          <FormField
+            label="Password"
+            type="password"
+            name="password"
+            autoComplete="current-password"
+            placeholder="Your password"
+            value={form.password}
+            onChange={updateField('password')}
+            error={errors.password}
+          />
+        </fieldset>
 
         <Button type="submit" fullWidth loading={submitting}>
           {submitting ? 'Logging in…' : 'Login'}
