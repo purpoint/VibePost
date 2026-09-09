@@ -100,3 +100,21 @@ export function parseFeedQuery(query = {}) {
 
   return { page, limit, sort, search };
 }
+
+export const COMMENT_MAX_LENGTH = 500;
+
+/**
+ * Validates a comment body. An empty or whitespace-only comment is rejected.
+ */
+export function validateCommentInput(body = {}) {
+  const text = typeof body.text === 'string' ? body.text.trim() : '';
+
+  if (!text) {
+    throw ApiError.badRequest('Comment cannot be empty');
+  }
+  if (text.length > COMMENT_MAX_LENGTH) {
+    throw ApiError.badRequest(`Comment must be at most ${COMMENT_MAX_LENGTH} characters`);
+  }
+
+  return { text };
+}

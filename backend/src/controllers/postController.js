@@ -1,5 +1,9 @@
 import * as postService from '../services/postService.js';
-import { validatePostInput, parseFeedQuery } from '../utils/validators.js';
+import {
+  validatePostInput,
+  parseFeedQuery,
+  validateCommentInput,
+} from '../utils/validators.js';
 import { uploadImage, destroyImage } from '../config/cloudinary.js';
 import { assertIsRealImage } from '../utils/imageInspector.js';
 
@@ -67,4 +71,37 @@ export async function deletePost(req, res) {
   await postService.deletePost({ postId: req.params.id, user: req.user });
 
   res.json({ success: true, data: { id: req.params.id } });
+}
+
+/**
+ * POST /api/posts/:id/like — toggles the current user's like.
+ */
+export async function toggleLike(req, res) {
+  const result = await postService.toggleLike({ postId: req.params.id, user: req.user });
+
+  res.json({ success: true, data: result });
+}
+
+/**
+ * GET /api/posts/:id/comments — newest first.
+ */
+export async function getComments(req, res) {
+  const result = await postService.listComments(req.params.id);
+
+  res.json({ success: true, data: result });
+}
+
+/**
+ * POST /api/posts/:id/comments
+ */
+export async function addComment(req, res) {
+  const { text } = validateCommentInput(req.body);
+
+  const result = await postService.addComment({
+    postId: req.params.id,
+    user: req.user,
+    text,
+  });
+
+  res.status(201).json({ success: true, data: result });
 }

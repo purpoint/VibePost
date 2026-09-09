@@ -84,6 +84,12 @@ export const postsApi = {
   },
 
   remove: (id) => api.delete(`/posts/${id}`).then(unwrap),
+
+  toggleLike: (id) => api.post(`/posts/${id}/like`).then(unwrap),
+
+  listComments: (id) => api.get(`/posts/${id}/comments`).then(unwrap),
+
+  addComment: (id, text) => api.post(`/posts/${id}/comments`, { text }).then(unwrap),
 };
 
 export const authApi = {

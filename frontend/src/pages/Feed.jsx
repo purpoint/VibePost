@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Inbox, SearchX, WifiOff } from 'lucide-react';
 import Navbar from '../components/Navbar/Navbar.jsx';
@@ -29,6 +29,11 @@ export default function Feed() {
   const [searchInput, setSearchInput] = useState('');
   const [activeSearch, setActiveSearch] = useState('');
   const [deletingId, setDeletingId] = useState(null);
+
+  // Posts with a like request in flight. A second click on the same post is
+  // ignored until the first settles, so a rapid double-click cannot race two
+  // toggles against each other.
+  const likesInFlight = useRef(new Set());
 
   const { user, isAuthenticated } = useAuth();
   const { showError, showSuccess } = useToast();
@@ -62,6 +67,41 @@ export default function Feed() {
     },
     [isAuthenticated, navigate]
   );
+
+  /** Applies a partial update to one post in the list. */
+  const patchPost = useCallback((postId, changes) => {
+    setPosts((current) =>
+      current.map((post) => (post._id === postId ? { ...post, ...changes } : post))
+    );
+  }, []);
+
+  /**
+   * Likes or unlikes a post.
+   *
+   * The card updates before the request completes so the button feels
+   * instant; if the server disagrees the change is rolled back, and the
+   * authoritative count from the response is applied either way.
+   */
+  async function handleLike(post) {
+    if (likesInFlight.current.has(post._id)) return;
+    likesInFlight.current.add(post._id);
+
+    const previous = { likedByMe: post.likedByMe, likeCount: post.likeCount };
+    patchPost(post._id, {
+      likedByMe: !post.likedByMe,
+      likeCount: post.likeCount + (post.likedByMe ? -1 : 1),
+    });
+
+    try {
+      const { liked, likeCount, likes } = await postsApi.toggleLike(post._id);
+      patchPost(post._id, { likedByMe: liked, likeCount, likes });
+    } catch (likeError) {
+      patchPost(post._id, previous);
+      showError(likeError.message);
+    } finally {
+      likesInFlight.current.delete(post._id);
+    }
+  }
 
   /** A new post appears at the top of the feed immediately, with no refetch. */
   function handleCreated(post) {
@@ -134,9 +174,7 @@ export default function Feed() {
             currentUserId={user?.id}
             deleting={deletingId === post._id}
             onDelete={handleDelete}
-            // Liking and commenting land in the next milestone; the gate that
-            // keeps them behind a login is already in place.
-            onLike={() => requireAuth(() => {})}
+            onLike={() => requireAuth(() => handleLike(post))}
             onComment={() => requireAuth(() => {})}
           />
         ))}
