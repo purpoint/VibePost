@@ -2,7 +2,7 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  background-color: rgba(7, 13, 26, 0.85);
+  background-color: var(--header-bg);
   backdrop-filter: blur(12px);
   border-block-end: 1px solid var(--border);
 }
@@ -49,6 +49,13 @@
   font-size: var(--text-xs);
   color: var(--text-muted);
   letter-spacing: 0.03em;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
 }
 
 .account {

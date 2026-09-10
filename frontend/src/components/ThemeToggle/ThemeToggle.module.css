@@ -1,0 +1,33 @@
+.toggle {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  color: var(--text-secondary);
+  background-color: transparent;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  transition: color var(--transition-fast), background-color var(--transition-fast),
+    border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .toggle:hover {
+    color: var(--primary);
+    background-color: var(--primary-soft);
+    border-color: var(--primary);
+  }
+}
+
+.toggle:active {
+  transform: scale(0.94);
+}
+
+/* A thumb needs more room than a cursor does. */
+@media (pointer: coarse) {
+  .toggle {
+    width: 44px;
+    height: 44px;
+  }
+}

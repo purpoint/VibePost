@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { LogOut, User } from 'lucide-react';
 import Avatar from '../Avatar/Avatar.jsx';
+import ThemeToggle from '../ThemeToggle/ThemeToggle.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import styles from './Navbar.module.css';
 
@@ -46,41 +47,45 @@ export default function Navbar() {
           </Link>
         </h1>
 
-        {isAuthenticated ? (
-          <div className={styles.account} ref={menuRef}>
-            <button
-              type="button"
-              className={styles.avatarButton}
-              onClick={() => setMenuOpen((open) => !open)}
-              aria-haspopup="menu"
-              aria-expanded={menuOpen}
-              aria-label="Account menu"
-            >
-              <Avatar name={user.name} username={user.username} src={user.avatarUrl} size={38} />
-            </button>
+        <div className={styles.controls}>
+          <ThemeToggle />
 
-            {menuOpen && (
-              <div className={styles.menu} role="menu">
-                <div className={styles.identity}>
-                  <User size={15} aria-hidden="true" />
-                  <div>
-                    <p className={styles.name}>{user.name}</p>
-                    <p className={styles.username}>@{user.username}</p>
+          {isAuthenticated ? (
+            <div className={styles.account} ref={menuRef}>
+              <button
+                type="button"
+                className={styles.avatarButton}
+                onClick={() => setMenuOpen((open) => !open)}
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                aria-label="Account menu"
+              >
+                <Avatar name={user.name} username={user.username} src={user.avatarUrl} size={38} />
+              </button>
+
+              {menuOpen && (
+                <div className={styles.menu} role="menu">
+                  <div className={styles.identity}>
+                    <User size={15} aria-hidden="true" />
+                    <div>
+                      <p className={styles.name}>{user.name}</p>
+                      <p className={styles.username}>@{user.username}</p>
+                    </div>
                   </div>
-                </div>
 
-                <button type="button" className={styles.menuItem} role="menuitem" onClick={logout}>
-                  <LogOut size={15} aria-hidden="true" />
-                  Log out
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <Link to="/login" className={styles.loginLink}>
-            Log in
-          </Link>
-        )}
+                  <button type="button" className={styles.menuItem} role="menuitem" onClick={logout}>
+                    <LogOut size={15} aria-hidden="true" />
+                    Log out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/login" className={styles.loginLink}>
+              Log in
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   );

@@ -6,7 +6,7 @@
   /* Mobile: a bottom sheet. Desktop centres the dialog (see the media query). */
   align-items: flex-end;
   justify-content: center;
-  background-color: rgba(3, 6, 14, 0.72);
+  background-color: var(--overlay);
   backdrop-filter: blur(3px);
   animation: fade-in var(--transition-fast);
 }

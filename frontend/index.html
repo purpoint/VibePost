@@ -15,6 +15,21 @@
     <title>VibePost — Share. Connect. Engage.</title>
   </head>
   <body>
+    <script>
+      // Runs before React mounts: a stored choice wins, otherwise follow the
+      // operating system. Without this the page paints dark, then corrects
+      // itself, which is visible as a flash.
+      (function () {
+        try {
+          var stored = localStorage.getItem('vibepost.theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          document.documentElement.dataset.theme =
+            stored === 'light' || stored === 'dark' ? stored : prefersLight ? 'light' : 'dark';
+        } catch (error) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
