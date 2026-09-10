@@ -9,6 +9,34 @@ posts, and comment on them.
 > Built with React + Vite on the frontend and Node/Express/MongoDB on the backend.
 > No TailwindCSS — the entire UI is hand-written CSS Modules on a dark navy design system.
 
+## Live
+
+| | |
+| --- | --- |
+| **App** | https://vibepost-chi.vercel.app |
+| **API** | https://vibepost-api.onrender.com |
+
+> The API runs on Render's free tier, which sleeps after inactivity. The first
+> request after an idle period can take up to a minute to wake it.
+
+![VibePost feed](docs/screenshots/feed-dark.png)
+
+---
+
+## Screenshots
+
+**Feed** — posts, engagement counts and relative timestamps.
+
+![Feed with posts](docs/screenshots/feed-posts.png)
+
+**Light theme** — the header toggle switches the whole palette.
+
+![Light theme](docs/screenshots/feed-light.png)
+
+| Mobile | Sign up |
+| --- | --- |
+| <img src="docs/screenshots/feed-mobile.png" width="300" alt="Mobile feed"> | <img src="docs/screenshots/signup.png" width="440" alt="Sign up screen"> |
+
 ---
 
 ## Tech Stack
@@ -239,6 +267,23 @@ Specification documents live in [`docs/`](./docs):
 
 ---
 
-## Status
+## Features
 
-Under active development — built milestone by milestone.
+- Email and password accounts with JWT authentication and session restore
+- Posts containing text, an image, or both — empty posts are rejected
+- Public feed readable without an account; posting, liking and commenting require one
+- Likes and comments, with the username of everyone who liked or commented stored
+- Feed sorting: All Posts, For You, Most Liked, Most Commented
+- Debounced search across post text and author names
+- Paginated loading with stable ordering
+- Light and dark themes
+- Responsive from 375px upwards, with keyboard navigation and AA colour contrast
+
+---
+
+## Testing
+
+```bash
+cd backend && npm test          # 106 tests against an in-memory MongoDB
+npm run smoke -- <api-url>      # 61 checks against a running deployment
+```
