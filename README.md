@@ -19,23 +19,14 @@ posts, and comment on them.
 > The API runs on Render's free tier, which sleeps after inactivity. The first
 > request after an idle period can take up to a minute to wake it.
 
-![VibePost feed](docs/screenshots/feed-dark.png)
+![VibePost feed](docs/screenshots/feed.png)
 
----
-
-## Screenshots
-
-**Feed** — posts, engagement counts and relative timestamps.
-
-![Feed with posts](docs/screenshots/feed-posts.png)
-
-**Light theme** — the header toggle switches the whole palette.
+<details>
+<summary>Light theme</summary>
 
 ![Light theme](docs/screenshots/feed-light.png)
 
-| Mobile | Sign up |
-| --- | --- |
-| <img src="docs/screenshots/feed-mobile.png" width="300" alt="Mobile feed"> | <img src="docs/screenshots/signup.png" width="440" alt="Sign up screen"> |
+</details>
 
 ---
 
